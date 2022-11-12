@@ -53,7 +53,7 @@
 
 <script>
 import axios from "axios";
-
+// import Cookies from 'js-cookie'
 export default {
   name: "LoginScreen",
   data() {
@@ -77,19 +77,22 @@ export default {
   },
 
   methods: {
-    login() {
+    login() { 
+      this.$router.push("/HomePage");
+      // Cookies.set('user_name',this.form.username)
       axios
         .post("http://localhost:8080/login", {
           name: this.form.username,
           pwd: this.form.password,
         })
         .then((res) => {
-          alert("登录成功");
+          // alert("登录成功");
           sessionStorage.username = this.form.username;
           sessionStorage.password = this.form.password;
           this.$cookies.set("user_name", this.form.username);
-          this.$router.push("/FileUpload");
+          
           console.log(res)
+         
         })
         .catch((err) => {
           alert(err + "登录失败");

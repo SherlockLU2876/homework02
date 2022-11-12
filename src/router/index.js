@@ -4,6 +4,7 @@ import TableInfo from '../pages/TableInfo.vue'
 import FileUpload from '../pages/FileUpload.vue'
 import FileList from '../pages/FileList.vue'
 import LoginScreen from '../components/LoginScreen.vue'
+// import HomePage from '../components/HomePage.vue'
 // import {
 //     Message
 // } from 'element-ui'
@@ -44,7 +45,8 @@ const router = new VueRouter({
             meta: {
                 requireAuth: false
             }
-        }
+        },
+
 
 
     ]

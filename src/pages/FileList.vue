@@ -1,25 +1,12 @@
 <template>
   <div>
     <el-form :inline="true" class="demo-form-inline" :model="searchselect">
-      <el-form-item label="上传人姓名">
-        <el-select v-model="searchselect.name" placeholder="请选择" clearable>
-          <el-option
-            v-for="item in options1"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-            :disabled="item.disabled"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="文件类别">
         <el-select v-model="searchselect.type" placeholder="请选择" clearable>
           <el-option
-            v-for="item in options2"
+            v-for="item in options"
             :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            :value="item"
             :disabled="item.disabled"
           >
           </el-option>
@@ -29,24 +16,20 @@
         <el-button type="primary" @click="searchinfo">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="tableData" style="width: 100%">
-      <!-- <el-table
+    <el-table
       :data="
-        tableData.filter(
-          (data) =>
-            !search || data.name.toLowerCase().includes(search.toLowerCase())
-        )
+        tableData.slice((currentPage - 1) * pageSize, currentPage * pageSize)
       "
       style="width: 100%"
-    > -->
-      <el-table-column label="id" prop="file_id" v-if="false">
-      </el-table-column>
-      <el-table-column label="上传人姓名" prop="file_uploader">
-      </el-table-column>
-      <el-table-column label="文件名" prop="file_name" v-model="file_name">
-      </el-table-column>
+    >
+      <el-table-column label="id" prop="file_id"></el-table-column>
+      <el-table-column label="上传人姓名" prop="file_uploader"></el-table-column>
+      <el-table-column label="文件名" prop="file_name" v-model="file_name"></el-table-column>
+      <el-table-column label="uuid" prop="file_uuid" ></el-table-column>
       <el-table-column label="文件类型" prop="file_type"> </el-table-column>
-      <el-table-column label="文件下载次数" prop="count"> </el-table-column>
+      <el-table-column label="文件上传时间" prop="file_upload_time" :formatter="formatTime" > </el-table-column>
+      <el-table-column label="文件大小kb" prop="file_size"> </el-table-column>
+      <el-table-column label="文件下载次数" prop="download_count"> </el-table-column>
       <el-table-column align="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row)">下载</el-button>
@@ -56,41 +39,36 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="block">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[1, 5, 10, 20]"
+        :page-size="pageSize"
+        layout="total,  sizes,prev, pager, next, jumper"
+        :total="tableData.length"
+      >
+      </el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-// import { arrayBuffer } from "stream/consumers";
-// import { arrayBuffer } from "stream/consumers";
-// axios.defaults.withCredentials = true
+
 export default {
   data() {
     return {
+      currentPage: 1,
+      pageSize: 5,
       tableData: [],
       searchselect: {
-        name: "",
         type: "",
       },
-      options1: [
-        {
-          value: "xiaowang",
-          label: "水果",
-        },
-        {
-          value: "2",
-          label: "数码",
-        },
-        {
-          value: "3",
-          label: "食品",
-        },
-        {
-          value: "4",
-          label: "衣服",
-        },
-      ],
-      options2: [],
+      select: {},
+
+      options: [],
 
       search: "",
       file_name: "",
@@ -106,8 +84,8 @@ export default {
     getlist() {
       axios
         .post("http://localhost:8080/getFileList", {
-          // filetype:"",
-          // fileName:""
+          // file_type:"图片",
+          // file_name:"微信图片_202210091123372.png"
         })
         .then((res) => {
           this.tableData = res.data;
@@ -117,106 +95,95 @@ export default {
           console.log(err + "请求失败aaaaa");
         });
     },
+    formatTime(row,column){
+    let data = row[column.property]
+    let dtime = new Date(data)
+    const year = dtime.getFullYear()
+    let month = dtime.getMonth() + 1
+    if (month < 10) {
+        month = '0' + month
+    }
+    let day = dtime.getDate()
+    if (day < 10) {
+        day = '0' + day
+    }
+    let hour = dtime.getHours()
+    if (hour < 10) {
+        hour = '0' + hour
+    }
+    let minute = dtime.getMinutes()
+    if (minute < 10) {
+        minute = '0' + minute
+    }
+    let second = dtime.getSeconds()
+    if (second < 10) {
+        second = '0' + second
+    }
+    return year+ '-' + month+ '-' + day + ' ' + hour + ':' + minute + ':' + second
+
+},
     getselectname() {
-      
+      console.log(this.searchselect.type);
       axios
         .post("http://localhost:8080/getFileType", {})
-        .then((res) => {
-          this.options1 = res.data;
-          // this.options1.label = res.data;
-          console.log(res.data + "请求到了数据bbbbbb");
-          // this.tableData = res.data;
+        .then((resquest) => {
+          this.options = resquest.data;
+          console.log(resquest.data + "请求到了数据bbbbbb");
         })
         .catch((err) => {
           console.log(err + "请求失败bbbbb");
         });
     },
     handleEdit(row) {
-      // axios.defaults.withCredentials = true;
       console.log(this.$cookies.get("user_name"));
-      console.log(row.file_id);
       console.log(row.file_name);
-      this.filename = row.file_name;
-      axios({
-        headers: {
-          // 'Access-Control-Allow-Credentials':true,
-          // withCredentials: true,
-          // 'Cookie': this.$cookies.get("user_name")
-        },
-        method: "post",
-        url: "http://localhost:8080/download2",
-        data: {
-          user_name: this.$cookies.get("user_name"),
-          fileName: this.filename,
-        },
-        header: {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=utf-8",
-          withCredentials: true,
-        },
-        responseType: "blob",
-      })
-        // axios
-        //   .post(
-        //     "http://localhost:8080/download2",
-        //     {
-        //       // 'Access-Control-Allow-Credentials':true,
-        //       user_name: this.$cookies.get("user_name"),
-        //       fileName: this.filename,
-        //       // responseType: "blob", //首先设置responseType字段格式为 blob
-        //     },
-        //     {
-        //      responseType:"arrayBuffer"
-        //     }
-        //   )
-        .then((res) => {
-          // this.download(res)
-          // let blob = res.data;
-          // let reader = new FileReader();
-          // reader.readAsDataURL(blob);
-          // reader.onload = (e) => {
-          //   let a = document.createElement("a");
-          //   a.download = this.fileName;
-          //   a.href = e.target.result;
-          //   document.body.appendChild(a);
-          //   a.click();
-          //   document.body.removeChild(a);
-          // };\
-          const filename = res.headers["content-disposition"];
-          const blob = new Blob([res.data]);
-          var downloadElement = document.createElement("a");
-          var href = window.URL.createObjectURL(blob);
-          downloadElement.href = href;
-          downloadElement.download = decodeURIComponent(
-            filename.split("filename=")[1]
-          );
-          document.body.appendChild(downloadElement);
-          downloadElement.click();
-          document.body.removeChild(downloadElement);
-          window.URL.revokeObjectURL(href);
-        });
+
+      window.open(
+        `http://localhost:8080/download2?user_name=${this.$cookies.get(
+          "user_name"
+        )}&fileName=${row.file_name}&file_id=${row.file_id}`
+      );
     },
     handleDelete(row) {
-      console.log(this.$cookies.get("user_name"));
-      console.log(row.id);
-      axios
-        .post("#", {
-          id: row.id,
+      this.$confirm("此操作将永久删除该条记录, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+
+          console.log(row.file_id);
+          console.log(this.$cookies.get("user_name"));
+          axios
+            .post("http://localhost:8080/deleteFile", {
+              file_id: row.file_id,
+              // user_name: this.$cookies.get("user_name"),
+            })
+            .then((response) => {
+              console.log(response);
+              this.getlist();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         })
-        .then((res) => {
-          console.log(res.data + "删除成功");
-        })
-        .catch((err) => {
-          console.log(err + "删除失败");
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
         });
     },
     searchinfo() {
-      console.log(this.searchselect.name);
       console.log(this.searchselect.type);
       axios
-        .post("http://localhost:8080/getFileList", {
-          filetype: this.searchselect.type,
-          fileName: this.searchselect.name,
+        .post("http://localhost:8080/selectByType", {
+          type: this.searchselect.type,
+          // fileName: this.searchselect.name,
         })
         .then((res) => {
           this.tableData = res.data;
@@ -226,18 +193,15 @@ export default {
           console.log(err + "请求失败cccccc");
         });
     },
-    // download(data){
-    //   if (!data) {
-    //         return
-    //     }
-    //     let url = window.URL.createObjectURL(new Blob([data]))
-    //     let link = document.createElement('a')
-    //     link.style.display = 'none'
-    //     link.href = url
-    //     link.setAttribute('download', 'excel.xlsx')
-    //     document.body.appendChild(link)
-    //     link.click()
-    // }
+    handleSizeChange(val) {
+      this.currentPage = 1;
+      this.pageSize = val;
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      console.log(`当前页: ${val}`);
+    },
   },
 };
 </script>

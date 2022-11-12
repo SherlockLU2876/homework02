@@ -1,3 +1,47 @@
+<!-- <template>
+  <div id="app"><loginScreen/></div>
+  
+</template>
+
+<script>
+import LoginScreen from './components/LoginScreen.vue';
+// import NvaHeader from "./components/NavHeader.vue";
+// import NvaMenu from "./components/NvaMenu.vue";
+export default {
+  name: "App",
+  components: {
+    // NvaMenu,
+    // NvaHeader,
+    LoginScreen,
+  },
+  // provide () {
+  //   return {
+  //     reload: this.reload
+  //   }
+  // },
+  // data () {
+  //   return {
+  //     isShow: true
+  //   }
+  // },
+  // methods: {
+  //   reload () {
+  //     this.isShow= false
+  //     this.$nextTick(function () {
+  //       this.isShow= true
+  //     })
+  //   }
+  // }
+};
+</script>
+
+<style>
+.header {
+  background-color: #409eff;
+  color: #fff;
+  line-height: 60px;
+}
+</style> -->
 <template>
   <div id="app">
     <el-container>
@@ -51,3 +95,4 @@ export default {
   line-height: 60px;
 }
 </style>
+
