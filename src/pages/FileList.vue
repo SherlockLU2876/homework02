@@ -22,14 +22,14 @@
       "
       style="width: 100%"
     >
-      <el-table-column label="id" prop="file_id"></el-table-column>
-      <el-table-column label="上传人姓名" prop="file_uploader"></el-table-column>
-      <el-table-column label="文件名" prop="file_name" v-model="file_name"></el-table-column>
-      <el-table-column label="uuid" prop="file_uuid" ></el-table-column>
-      <el-table-column label="文件类型" prop="file_type"> </el-table-column>
-      <el-table-column label="文件上传时间" prop="file_upload_time" :formatter="formatTime" > </el-table-column>
-      <el-table-column label="文件大小kb" prop="file_size"> </el-table-column>
-      <el-table-column label="文件下载次数" prop="download_count"> </el-table-column>
+      <el-table-column label="id" prop="file_id" width="45px" ></el-table-column>
+      <el-table-column label="上传人姓名" prop="file_uploader"  width="100px" ></el-table-column>
+      <el-table-column label="文件名" prop="file_name" v-model="file_name"  width="350px" ></el-table-column>
+      <el-table-column label="uuid" prop="file_uuid" width="350px" v-model="file_uuid" ></el-table-column>
+      <el-table-column label="文件类型" prop="file_type" width="85px"> </el-table-column>
+      <el-table-column label="文件上传时间" prop="file_upload_time" :formatter="formatTime" width="150px"> </el-table-column>
+      <el-table-column label="文件大小" prop="file_size" width="85px"> </el-table-column>
+      <el-table-column label="下载次数" prop="download_count" width="85px"> </el-table-column>
       <el-table-column align="right">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row)">下载</el-button>
@@ -72,6 +72,8 @@ export default {
 
       search: "",
       file_name: "",
+      file_uuid:''
+
     };
   },
 
@@ -141,8 +143,9 @@ export default {
       window.open(
         `http://localhost:8080/download2?user_name=${this.$cookies.get(
           "user_name"
-        )}&fileName=${row.file_name}&file_id=${row.file_id}`
+        )}&file_uuid=${row.file_uuid}&file_id=${row.file_id}`
       );
+      this.created();
     },
     handleDelete(row) {
       this.$confirm("此操作将永久删除该条记录, 是否继续?", "提示", {

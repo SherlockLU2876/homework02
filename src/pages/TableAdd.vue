@@ -85,6 +85,7 @@ export default {
           price: this.addtabledata.goodsprice,
           categoryId: this.addtabledata.goodstype,
           id: this.addtabledata.goodsid
+
         })
         .then((response) => {
           console.log("cccccc", response),
@@ -92,6 +93,7 @@ export default {
               type: "success",
               message: "成功!",
             });
+          this.$router.push("/TableInfo");
         })
         .catch((error) => {
           console.log(error);

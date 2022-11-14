@@ -78,7 +78,7 @@ export default {
 
   methods: {
     login() { 
-      this.$router.push("/HomePage");
+      
       // Cookies.set('user_name',this.form.username)
       axios
         .post("http://localhost:8080/login", {
@@ -90,7 +90,7 @@ export default {
           sessionStorage.username = this.form.username;
           sessionStorage.password = this.form.password;
           this.$cookies.set("user_name", this.form.username);
-          
+          this.$router.push("/fileUpload");
           console.log(res)
          
         })

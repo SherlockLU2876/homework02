@@ -31,7 +31,7 @@
       <template slot-scope="{ row }" slot="name">
         <strong>{{ row.name }}</strong>
       </template>
-      <template slot-scope="index" slot="action">
+      <!-- <template slot-scope="index" slot="action">
         <Button
           type="primary"
           size="small"
@@ -42,7 +42,7 @@
         <Button type="error" size="small" @click="remove(index.row.goodsid)"
           >删除</Button
         >
-      </template>
+      </template> -->
     </Table>
     <el-dialog title="商品信息" :visible.sync="dialogFormVisible" width="33%">
       <el-form
